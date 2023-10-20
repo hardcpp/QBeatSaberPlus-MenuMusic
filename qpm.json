@@ -1,0 +1,55 @@
+{
+  "sharedDir": "shared",
+  "dependenciesDir": "extern",
+  "info": {
+    "name": "QBeatSaberPlus-MenuMusic",
+    "id": "qbeatsaberplus-menumusic",
+    "version": "0.1.1-v6.2.0",
+    "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
+    "additionalData": {
+      "overrideSoName": "libqbeatsaberplus-menumusic.so"
+    }
+  },
+  "dependencies": [
+    {
+      "id": "beatsaber-hook",
+      "versionRange": "^3.14.0",
+      "additionalData": {
+        "extraFiles": [
+          "src/inline-hook"
+        ]
+      }
+    },
+    {
+      "id": "codegen",
+      "versionRange": "^0.33.0",
+      "additionalData": {}
+    },
+    {
+      "id": "custom-types",
+      "versionRange": "^0.15.24",
+      "additionalData": {}
+    },
+    {
+      "id": "modloader",
+      "versionRange": "^1.2.3",
+      "additionalData": {}
+    },
+    {
+      "id": "libil2cpp",
+      "versionRange": "^0.2.3",
+      "additionalData": {}
+    },
+    {
+      "id": "songloader",
+      "versionRange": "^0.10.15",
+      "additionalData": {}
+    },
+    {
+      "id": "chatplex-sdk-bs",
+      "versionRange": "^0.1.1-v6.2.0",
+      "additionalData": {}
+    }
+  ],
+  "workspace": null
+}
