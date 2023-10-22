@@ -49,27 +49,29 @@
       {
         "id": "chatplex-sdk-bs",
         "versionRange": "^0.1.1-v6.2.0",
-        "additionalData": {}
+        "additionalData": {
+          "private": true
+        }
       }
     ],
     "workspace": {
       "scripts": {
-        "build": [
-          "pwsh ./build.ps1"
-        ],
-        "clean": [
-          "pwsh ./build.ps1 -clean"
-        ],
-        "copy": [
-          "pwsh ./copy.ps1"
-        ],
-        "log": [
-          "pwsh ./start-logging.ps1"
-        ],
         "qmod": [
           "pwsh ./build.ps1 -clean",
           "qpm qmod build",
           "pwsh ./createqmod.ps1 -clean"
+        ],
+        "clean": [
+          "pwsh ./build.ps1 -clean"
+        ],
+        "log": [
+          "pwsh ./start-logging.ps1"
+        ],
+        "build": [
+          "pwsh ./build.ps1"
+        ],
+        "copy": [
+          "pwsh ./copy.ps1"
         ]
       }
     }
@@ -102,7 +104,10 @@
         "id": "chatplex-sdk-bs",
         "versionRange": "=0.1.1-v6.2.0",
         "additionalData": {
+          "soLink": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v0.1.1-v6.2.0/libchatplex-sdk-bs.so",
+          "debugSoLink": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v0.1.1-v6.2.0/debug_libchatplex-sdk-bs.so",
           "overrideSoName": "libchatplex-sdk-bs.so",
+          "branchName": "version/v0_1_1-v6_2_0",
           "cmake": true
         }
       },
