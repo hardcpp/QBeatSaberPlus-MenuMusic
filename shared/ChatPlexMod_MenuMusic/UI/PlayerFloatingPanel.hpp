@@ -17,9 +17,9 @@ namespace ChatPlexMod_MenuMusic::UI {
     /// @brief Player floating panel view
     class PlayerFloatingPanel : public CP_SDK::UI::ViewController
     {
-        CP_SDK_IL2CPP_INHERIT_CUSTOM("ChatPlexMod_MenuMusic.UI", PlayerFloatingPanel, CP_SDK::UI::ViewController);
-        CP_SDK_IL2CPP_DECLARE_CTOR_CHAIN(PlayerFloatingPanel, CP_SDK::UI::ViewController);
-        CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_CHAIN(PlayerFloatingPanel, CP_SDK::UI::ViewController);
+        CP_SDK_IL2CPP_INHERIT("ChatPlexMod_MenuMusic.UI", PlayerFloatingPanel, CP_SDK::UI::ViewController);
+        CP_SDK_IL2CPP_DECLARE_CTOR_CHILD(PlayerFloatingPanel);
+        CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_CHILD(PlayerFloatingPanel);
         CP_SDK_UI_VIEW_CONTROLLER_INSTANCE();
 
         private:

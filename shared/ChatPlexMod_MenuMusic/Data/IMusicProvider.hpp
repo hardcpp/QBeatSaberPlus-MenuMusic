@@ -14,10 +14,10 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @brief Music provider interface
     class IMusicProvider
     {
-        DISABLE_COPY_MOVECONSTRUCTORS(IMusicProvider);
+        CP_SDK_NO_COPYMOVE_CTORS(IMusicProvider);
 
         protected:
-            PRIVATE_TAG();
+            CP_SDK_PRIV_TAG();
 
         public:
             virtual MusicProviderType::E                        Type()          = 0;
@@ -29,7 +29,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             using Ptr = std::shared_ptr<IMusicProvider>;
 
             /// @brief Constructor
-            IMusicProvider(PRIVATE_TAG_ARG());
+            IMusicProvider(CP_SDK_PRIV_TAG_ARG());
             /// @brief Destructor
             virtual ~IMusicProvider();
 
