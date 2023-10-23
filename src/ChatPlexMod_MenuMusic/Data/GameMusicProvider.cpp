@@ -37,7 +37,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
 
     /// @brief Constructor
     GameMusicProvider::GameMusicProvider()
-        : IMusicProvider(PRIVATE_TAG_VAL())
+        : IMusicProvider(CP_SDK_PRIV_TAG_VAL())
     {
         m_IsLoading = true;
     }

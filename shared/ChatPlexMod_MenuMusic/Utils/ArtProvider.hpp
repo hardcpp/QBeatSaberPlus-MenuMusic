@@ -20,7 +20,7 @@ namespace ChatPlexMod_MenuMusic::Utils {
     /// @brief Art provider for the player floating panel
     class ArtProvider
     {
-        DISABLE_CONSTRUCTORS(ArtProvider);
+        CP_SDK_NO_DEF_CTORS(ArtProvider);
 
         private:
             static CP_SDK::Unity::TextureRaw::PixelArray m_BackgroundMask;

@@ -9,7 +9,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @brief Music provider interface
     class GameMusicProvider : public IMusicProvider
     {
-        DISABLE_COPY_MOVECONSTRUCTORS(GameMusicProvider);
+        CP_SDK_NO_COPYMOVE_CTORS(GameMusicProvider);
 
         private:
             std::vector<std::shared_ptr<Music>> m_Musics;

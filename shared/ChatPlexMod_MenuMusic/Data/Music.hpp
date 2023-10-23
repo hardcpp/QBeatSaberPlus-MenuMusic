@@ -19,7 +19,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @brief Generic music entry
     class Music : public std::enable_shared_from_this<Music>
     {
-        DISABLE_CONSTRUCTORS(Music);
+        CP_SDK_NO_DEF_CTORS(Music);
 
         private:
             IMusicProvider::Ptr m_MusicProvider;

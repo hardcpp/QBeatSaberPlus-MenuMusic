@@ -4,7 +4,7 @@
 namespace ChatPlexMod_MenuMusic { namespace Data {
 
     /// @brief Constructor
-    IMusicProvider::IMusicProvider(PRIVATE_TAG_ARG())
+    IMusicProvider::IMusicProvider(CP_SDK_PRIV_TAG_ARG())
     {
 
     }

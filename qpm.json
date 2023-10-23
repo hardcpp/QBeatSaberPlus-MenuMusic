@@ -4,7 +4,7 @@
   "info": {
     "name": "QBeatSaberPlus-MenuMusic",
     "id": "qbeatsaberplus-menumusic",
-    "version": "0.1.1-v6.2.0",
+    "version": "1.0.0-v6.2.0",
     "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
     "additionalData": {
       "overrideSoName": "libqbeatsaberplus-menumusic.so"
@@ -47,8 +47,10 @@
     },
     {
       "id": "chatplex-sdk-bs",
-      "versionRange": "^0.1.1-v6.2.0",
-      "additionalData": {}
+      "versionRange": "^1.0.0-v6.2.0",
+      "additionalData": {
+        "private": true
+      }
     }
   ],
   "workspace": {

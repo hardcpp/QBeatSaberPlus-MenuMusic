@@ -14,9 +14,9 @@ namespace ChatPlexMod_MenuMusic::UI {
     /// @brief Settings main view controller
     class SettingsMainView : public CP_SDK::UI::ViewController
     {
-        CP_SDK_IL2CPP_INHERIT_CUSTOM("ChatPlexMod_MenuMusic.UI", SettingsMainView, CP_SDK::UI::ViewController);
-        CP_SDK_IL2CPP_DECLARE_CTOR_CHAIN(SettingsMainView, CP_SDK::UI::ViewController);
-        CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_CHAIN(SettingsMainView, CP_SDK::UI::ViewController);
+        CP_SDK_IL2CPP_INHERIT("ChatPlexMod_MenuMusic.UI", SettingsMainView, CP_SDK::UI::ViewController);
+        CP_SDK_IL2CPP_DECLARE_CTOR_CHILD(SettingsMainView);
+        CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_CHILD(SettingsMainView);
         CP_SDK_UI_VIEW_CONTROLLER_INSTANCE();
 
         private:

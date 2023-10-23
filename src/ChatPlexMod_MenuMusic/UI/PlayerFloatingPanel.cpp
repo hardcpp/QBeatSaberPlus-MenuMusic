@@ -22,7 +22,7 @@ namespace ChatPlexMod_MenuMusic::UI {
     ////////////////////////////////////////////////////////////////////////////
 
     /// @brief Constructor
-    CP_SDK_IL2CPP_DECLARE_CTOR_CHAIN_IMPL(PlayerFloatingPanel, CP_SDK::UI::ViewController)
+    CP_SDK_IL2CPP_DECLARE_CTOR_IMPL(PlayerFloatingPanel)
     {
         m_CancellationToken = CP_SDK::Misc::FastCancellationToken::Make();
 
@@ -30,7 +30,7 @@ namespace ChatPlexMod_MenuMusic::UI {
         OnViewActivation    = {this, &PlayerFloatingPanel::OnViewActivation_Impl};
     }
     /// @brief Destructor
-    CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_CHAIN_IMPL(PlayerFloatingPanel, CP_SDK::UI::ViewController)
+    CP_SDK_IL2CPP_DECLARE_DTOR_MONOBEHAVIOUR_IMPL(PlayerFloatingPanel)
     {
 
     }
