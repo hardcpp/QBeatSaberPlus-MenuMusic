@@ -4,7 +4,7 @@
   "info": {
     "name": "QBeatSaberPlus-MenuMusic",
     "id": "qbeatsaberplus-menumusic",
-    "version": "1.0.0-v6.2.0",
+    "version": "1.0.1-v6.2.0",
     "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
     "additionalData": {
       "overrideSoName": "libqbeatsaberplus-menumusic.so"
@@ -47,7 +47,7 @@
     },
     {
       "id": "chatplex-sdk-bs",
-      "versionRange": "^1.0.0-v6.2.0",
+      "versionRange": "^1.0.1-v6.2.0",
       "additionalData": {
         "private": true
       }
@@ -68,6 +68,10 @@
         "pwsh ./start-logging.ps1"
       ],
       "qmod": [
+        "pwsh ./build.ps1 -clean",
+        "pwsh ./createqmod.ps1 -clean"
+      ],
+      "qmod_backup": [
         "pwsh ./build.ps1 -clean",
         "qpm qmod build",
         "pwsh ./createqmod.ps1 -clean"
