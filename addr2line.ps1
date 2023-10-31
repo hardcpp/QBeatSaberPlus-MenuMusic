@@ -9,7 +9,7 @@ else
 {
     if ($p1)
     {
-        & $NDKPath\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-addr2line.exe -e .\build\debug\libqbeatsaberplus_menumusic.so $p1
+        & $NDKPath\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-addr2line.exe -e .\build\debug\libqbeatsaberplus-menumusic.so $p1
     }
     else
     {

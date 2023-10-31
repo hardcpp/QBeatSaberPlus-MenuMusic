@@ -244,18 +244,27 @@ namespace ChatPlexMod_MenuMusic {
     /// @brief Create floating player window
     custom_types::Helpers::Coroutine MenuMusic::CreateFloatingPlayer_Coroutine()
     {
+        co_yield nullptr;
+
         if (m_Instance->m_PlayerFloatingPanel)
         {
             m_Instance->m_CreateFloatingPlayerCoroutine = nullptr;
             co_return;
         }
 
-        GameObject* l_ScreenContainer = nullptr;
-
-        auto l_Waiter = WaitForSecondsRealtime::New_ctor(0.25f)->i_IEnumerator();
+        auto l_ScreenContainer  = (GameObject*)nullptr;
+        auto l_Waiter           = WaitForSecondsRealtime::New_ctor(0.25f)->i_IEnumerator();
         while (true)
         {
-            l_ScreenContainer = Resources::FindObjectsOfTypeAll<GameObject*>().FirstOrDefault([](GameObject* x) -> bool { return x->get_activeInHierarchy() && x->get_name() == u"ScreenContainer"; });
+            if (CP_SDK::ChatPlexSDK::ActiveGenericScene() != CP_SDK::EGenericScene::Menu)
+            {
+                m_Instance->m_CreateFloatingPlayerCoroutine = nullptr;
+                co_return;
+            }
+
+            l_ScreenContainer = Resources::FindObjectsOfTypeAll<GameObject*>().FirstOrDefault([](GameObject* x) -> bool {
+                return CP_SDK::Utils::IsUnityPtrValid(x) && x->get_activeInHierarchy() && x->get_name() == u"ScreenContainer";
+            });
 
             if (l_ScreenContainer != nullptr && l_ScreenContainer)
                 break;
@@ -424,6 +433,8 @@ namespace ChatPlexMod_MenuMusic {
     /// @param p_Callback Callback action
     custom_types::Helpers::Coroutine MenuMusic::Coroutine_WaitUntilReady(CP_SDK::Utils::Action<> p_Callback)
     {
+        co_yield nullptr;
+
         while (!m_Instance->m_MusicProvider || !m_Instance->m_MusicProvider->IsReady())
             co_yield nullptr;
 
@@ -438,6 +449,8 @@ namespace ChatPlexMod_MenuMusic {
             CP_SDK::Unity::MTCoroutineStarter::Stop(m_Instance->m_WaitAndPlayNextSongCoroutine.Ptr());
             m_Instance->m_WaitAndPlayNextSongCoroutine = nullptr;
         }
+
+        co_yield nullptr;
 
         /// Skip if it's not the menu
         if (CP_SDK::ChatPlexSDK::ActiveGenericScene() != CP_SDK::EGenericScene::Menu)
@@ -546,6 +559,8 @@ namespace ChatPlexMod_MenuMusic {
     /// @param p_WaitTime Time to wait
     custom_types::Helpers::Coroutine MenuMusic::Coroutine_WaitAndPlayNextMusic(float p_EndTime)
     {
+        co_yield nullptr;
+
         auto l_Interval = 1.0f / 16.0f;
         auto l_Waiter   = reinterpret_cast<IEnumerator*>(WaitForSeconds::New_ctor(l_Interval));
 

@@ -37,11 +37,19 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @param p_CustomData    Custom data
     Music::Music(const IMusicProvider::Ptr& p_MusicProvider, std::u16string_view p_SongPath, std::u16string_view p_SongCoverPath, std::u16string_view p_SongName, std::u16string_view p_SongArtist, std::string_view p_CustomData)
     {
+        auto f_Trim = [](std::u16string& p_Str) {
+            p_Str.erase(p_Str.find_last_not_of(u" \n\r\t")+1);
+            p_Str.erase(0, p_Str.find_first_not_of(u" \n\r\t"));
+        };
+
         m_MusicProvider = p_MusicProvider;
         m_SongPath      = StringW(p_SongPath)->Replace('\\', '/');
         m_SongCoverPath = StringW(p_SongCoverPath)->Replace('\\', '/');
-        m_SongName      = StringW(p_SongName)->Trim();
-        m_SongArtist    = StringW(p_SongArtist)->Trim();
+        m_SongName      = p_SongName;
+        m_SongArtist    = p_SongArtist;
+
+        f_Trim(m_SongName);
+        f_Trim(m_SongArtist);
 
         if (!p_CustomData.empty())
             m_CustomData = p_CustomData;

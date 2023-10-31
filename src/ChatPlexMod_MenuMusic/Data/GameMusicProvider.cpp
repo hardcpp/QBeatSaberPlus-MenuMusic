@@ -6,8 +6,9 @@
 #include <CP_SDK_BS/Game/LevelSelection.hpp>
 #include <songloader/shared/API.hpp>
 
+#include <filesystem>
+
 #include <GlobalNamespace/CustomPreviewBeatmapLevel.hpp>
-#include <System/IO/Path.hpp>
 #include <UnityEngine/Random.hpp>
 
 using namespace GlobalNamespace;
@@ -64,7 +65,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @param p_Music Target music
     bool GameMusicProvider::StartGameSpecificGamePlay(const std::shared_ptr<Music>& p_Music)
     {
-        if (!p_Music)
+        if (!p_Music || !RuntimeSongLoader::API::HasLoadedSongs())
             return false;
 
         auto l_CustomPreviewBeatmapLevel = RuntimeSongLoader::API::GetLevelById(p_Music->GetCustomData());
@@ -81,24 +82,24 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @brief Load game songs
     custom_types::Helpers::Coroutine GameMusicProvider::Coroutine_LoadGameSongs(Ptr p_Self)
     {
-        auto l_Self = *reinterpret_cast<std::shared_ptr<GameMusicProvider>*>(&p_Self);
-
         co_yield nullptr;
 
         while (!RuntimeSongLoader::API::HasLoadedSongs())
             co_yield nullptr;
 
+        auto l_Self = *reinterpret_cast<std::shared_ptr<GameMusicProvider>*>(&p_Self);
         try
         {
-            const auto& l_LoadedSongs = RuntimeSongLoader::API::GetLoadedSongs();
-
+            const auto l_LoadedSongs = RuntimeSongLoader::API::GetLoadedSongs();
             for (auto& l_Current : l_LoadedSongs)
             {
-                auto l_Extension = System::IO::Path::GetExtension(l_Current->standardLevelInfoSaveData->songFilename)->ToLower();
+                auto l_Extension = std::filesystem::path(l_Current->standardLevelInfoSaveData->songFilename).extension().string();
+                std::transform(l_Extension.begin(), l_Extension.end(), l_Extension.begin(), ::tolower);
+
                 if (l_Extension != ".egg" && l_Extension != ".ogg")
                     continue;
 
-                auto l_Prefix = l_Current->customLevelPath.operator std::__ndk1::u16string() + u"/";
+                std::u16string l_Prefix = l_Current->customLevelPath.operator std::__ndk1::u16string() + u"/";
                 l_Self->m_Musics.push_back(std::shared_ptr<Music>(new Music(
                     l_Self,
                     l_Prefix + l_Current->standardLevelInfoSaveData->songFilename,
