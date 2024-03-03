@@ -6,6 +6,10 @@
 
 #include <CP_SDK/Unity/MTCoroutineStarter.hpp>
 
+#include <UnityEngine/Random.hpp>
+
+using namespace UnityEngine;
+
 namespace ChatPlexMod_MenuMusic { namespace Data {
 
     MusicProviderType::E CustomMusicProvider::Type()
@@ -59,6 +63,18 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     {
         return false;
     }
+    /// @brief Shuffle music collection
+    void CustomMusicProvider::Shuffle()
+    {
+        for (auto l_I = 0; l_I < m_Musics.size(); ++l_I)
+        {
+            auto l_Swapped  = m_Musics[l_I];
+            auto l_NewIndex = Random::Range(l_I, m_Musics.size());
+
+            m_Musics[l_I]           = m_Musics[l_NewIndex];
+            m_Musics[l_NewIndex]    = l_Swapped;
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -107,6 +123,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                 )));
             }
 
+            l_Self->Shuffle();
         }
         catch (const std::exception& l_Exception)
         {

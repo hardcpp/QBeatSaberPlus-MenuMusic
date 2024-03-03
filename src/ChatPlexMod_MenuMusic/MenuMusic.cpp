@@ -367,12 +367,9 @@ namespace ChatPlexMod_MenuMusic {
         }
 
         if (p_Random)
-        {
-            auto l_Random = System::Random::New_ctor(System::Environment::get_TickCount());
-            m_CurrentSongIndex = l_Random->Next(0, m_MusicProvider->Musics().size());
-        }
-        else
-            m_CurrentSongIndex++;
+            m_MusicProvider->Shuffle();
+
+        m_CurrentSongIndex++;
 
         /// Load and play audio clip
         LoadNextMusic(p_OnSceneTransition);

@@ -36,6 +36,8 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             /// @brief Per game implementation of the Play It button
             /// @param p_Music Target music
             bool StartGameSpecificGamePlay(const std::shared_ptr<Music>& p_Music) override;
+            /// @brief Shuffle music collection
+            void Shuffle() override;
 
         private:
             /// @brief Load game songs

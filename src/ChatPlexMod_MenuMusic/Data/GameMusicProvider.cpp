@@ -75,6 +75,18 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         CP_SDK_BS::Game::LevelSelection::FilterToSpecificSong(l_CustomPreviewBeatmapLevel.value());
         return true;
     }
+    /// @brief Shuffle music collection
+    void GameMusicProvider::Shuffle()
+    {
+        for (auto l_I = 0; l_I < m_Musics.size(); ++l_I)
+        {
+            auto l_Swapped  = m_Musics[l_I];
+            auto l_NewIndex = Random::Range(l_I, m_Musics.size());
+
+            m_Musics[l_I]           = m_Musics[l_NewIndex];
+            m_Musics[l_NewIndex]    = l_Swapped;
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -110,14 +122,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                 )));
             }
 
-            for (auto l_I = 0; l_I < l_Self->m_Musics.size(); ++l_I)
-            {
-                auto l_Swapped  = l_Self->m_Musics[l_I];
-                auto l_NewIndex = Random::Range(l_I, l_Self->m_Musics.size());
-
-                l_Self->m_Musics[l_I]           = l_Self->m_Musics[l_NewIndex];
-                l_Self->m_Musics[l_NewIndex]    = l_Swapped;
-            }
+            l_Self->Shuffle();
 
             l_Self->m_IsLoading = false;
         }
