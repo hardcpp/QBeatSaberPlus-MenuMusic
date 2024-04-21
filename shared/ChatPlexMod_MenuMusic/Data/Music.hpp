@@ -27,7 +27,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             std::u16string      m_SongCoverPath;
             std::u16string      m_SongName;
             std::u16string      m_SongArtist;
-            std::string         m_CustomData;
+            std::u16string      m_CustomData;
 
         public:
             const IMusicProvider::Ptr& MusicProvider();
@@ -42,7 +42,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             /// @param p_SongName      Name of the song
             /// @param p_SongArtist    Artist of the song
             /// @param p_CustomData    Custom data
-            Music(const IMusicProvider::Ptr& p_MusicProvider, std::u16string_view p_SongPath, std::u16string_view p_SongCoverPath, std::u16string_view p_SongName, std::u16string_view p_SongArtist, std::string_view p_CustomData);
+            Music(const IMusicProvider::Ptr& p_MusicProvider, std::u16string_view p_SongPath, std::u16string_view p_SongCoverPath, std::u16string_view p_SongName, std::u16string_view p_SongArtist, std::u16string_view p_CustomData);
 
         public:
             /// @brief Get song path
@@ -54,7 +54,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             /// @brief Get song name
             std::u16string_view GetSongArtist();
             /// @brief Get custom data
-            std::string_view GetCustomData();
+            std::u16string_view GetCustomData();
 
         public:
             /// @brief Get audio clip async

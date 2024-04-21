@@ -11,7 +11,6 @@
 #include <CP_SDK/ModuleBase.hpp>
 #include <CP_SDK/ChatPlexSDK.hpp>
 
-#include <GlobalNamespace/CustomPreviewBeatmapLevel.hpp>
 #include <GlobalNamespace/SongPreviewPlayer.hpp>
 #include <System/Collections/IEnumerator.hpp>
 #include <UnityEngine/Coroutine.hpp>

@@ -4,11 +4,13 @@
 
 #include <CP_SDK/Unity/MTCoroutineStarter.hpp>
 #include <CP_SDK_BS/Game/LevelSelection.hpp>
-#include <songloader/shared/API.hpp>
+#include <CP_SDK_BS/Game/Levels.hpp>
+#include <songcore/shared/SongCore.hpp>
 
 #include <filesystem>
 
-#include <GlobalNamespace/CustomPreviewBeatmapLevel.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
+#include <GlobalNamespace/FileSystemPreviewMediaData.hpp>
 #include <UnityEngine/Random.hpp>
 
 using namespace GlobalNamespace;
@@ -65,14 +67,11 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @param p_Music Target music
     bool GameMusicProvider::StartGameSpecificGamePlay(const std::shared_ptr<Music>& p_Music)
     {
-        if (!p_Music || !RuntimeSongLoader::API::HasLoadedSongs())
+        BeatmapLevel* l_BeatmapLevel = nullptr;
+        if (!p_Music || !CP_SDK_BS::Game::Levels::TryGetBeatmapLevelForLevelID(p_Music->GetCustomData(), &l_BeatmapLevel))
             return false;
 
-        auto l_CustomPreviewBeatmapLevel = RuntimeSongLoader::API::GetLevelById(p_Music->GetCustomData());
-        if (!l_CustomPreviewBeatmapLevel)
-            return false;
-
-        CP_SDK_BS::Game::LevelSelection::FilterToSpecificSong(l_CustomPreviewBeatmapLevel.value());
+        CP_SDK_BS::Game::LevelSelection::FilterToSpecificSong(l_BeatmapLevel);
         return true;
     }
     /// @brief Shuffle music collection
@@ -96,29 +95,32 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     {
         co_yield nullptr;
 
-        while (!RuntimeSongLoader::API::HasLoadedSongs())
+        while (!SongCore::API::Loading::AreSongsLoaded())
             co_yield nullptr;
 
         auto l_Self = *reinterpret_cast<std::shared_ptr<GameMusicProvider>*>(&p_Self);
         try
         {
-            const auto l_LoadedSongs = RuntimeSongLoader::API::GetLoadedSongs();
+            const auto l_LoadedSongs = SongCore::API::Loading::GetAllLevels();
             for (auto& l_Current : l_LoadedSongs)
             {
-                auto l_Extension = std::filesystem::path(l_Current->standardLevelInfoSaveData->songFilename).extension().string();
+                auto l_FileSystemPreviewMediaData = il2cpp_utils::try_cast<FileSystemPreviewMediaData>(l_Current->___previewMediaData);
+                if (!l_FileSystemPreviewMediaData.has_value())
+                    continue;
+
+                auto l_Extension = std::filesystem::path(l_FileSystemPreviewMediaData.value()->____previewAudioClipPath).extension().string();
                 std::transform(l_Extension.begin(), l_Extension.end(), l_Extension.begin(), ::tolower);
 
                 if (l_Extension != ".egg" && l_Extension != ".ogg")
                     continue;
 
-                std::u16string l_Prefix = l_Current->customLevelPath.operator std::__ndk1::u16string() + u"/";
                 l_Self->m_Musics.push_back(std::shared_ptr<Music>(new Music(
                     l_Self,
-                    l_Prefix + l_Current->standardLevelInfoSaveData->songFilename,
-                    l_Prefix + l_Current->standardLevelInfoSaveData->coverImageFilename,
-                    l_Current->songName,
-                    l_Current->songAuthorName,
-                    l_Current->levelID.operator std::__ndk1::string()
+                    l_FileSystemPreviewMediaData.value()->____previewAudioClipPath,
+                    l_FileSystemPreviewMediaData.value()->____coverSpritePath,
+                    l_Current->___songName,
+                    l_Current->___songAuthorName,
+                    l_Current->___levelID.operator std::__ndk1::u16string_view()
                 )));
             }
 
