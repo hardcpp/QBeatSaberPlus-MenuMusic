@@ -1,10 +1,10 @@
 {
-  "_QPVersion": "0.1.2",
+  "_QPVersion": "0.1.1",
   "name": "QBeatSaberPlus-MenuMusic",
   "id": "qbeatsaberplus-menumusic",
   "modloader": "Scotland2",
   "author": "HardCPP",
-  "version": "6.2.1",
+  "version": "6.3.0",
   "packageId": "com.beatgames.beatsaber",
   "packageVersion": "1.35.0_8016709773",
   "description": "Feel good!",
@@ -13,7 +13,7 @@
     {
       "version": "^0.17.6",
       "id": "custom-types",
-      "downloadIfMissing": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.6/CustomTypes.qmod"
+      "downloadIfMissing": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.7/CustomTypes.qmod"
     },
     {
       "version": "=1.1.4",
@@ -24,6 +24,11 @@
       "version": "^3.6.3",
       "id": "paper",
       "downloadIfMissing": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/paperlog.qmod"
+    },
+    {
+      "version": "^6.3.0",
+      "id": "chatplex-sdk-bs",
+      "downloadIfMissing": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v6.3.0/ChatPlexSDK-BS.qmod"
     }
   ],
   "modFiles": [],
@@ -31,7 +36,6 @@
     "libqbeatsaberplus-menumusic.so"
   ],
   "libraryFiles": [
-    "libchatplex-sdk-bs.so",
     "libbeatsaber-hook_5_1_6.so"
   ],
   "fileCopies": [],

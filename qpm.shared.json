@@ -6,7 +6,7 @@
     "info": {
       "name": "QBeatSaberPlus-MenuMusic",
       "id": "qbeatsaberplus-menumusic",
-      "version": "6.2.1",
+      "version": "6.3.0",
       "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
       "additionalData": {
         "overrideSoName": "libqbeatsaberplus-menumusic.so",
@@ -36,7 +36,10 @@
           "qpm qmod build",
           "pwsh ./createqmod.ps1 -clean"
         ]
-      }
+      },
+      "qmodIncludeDirs": [],
+      "qmodIncludeFiles": [],
+      "qmodOutput": null
     },
     "dependencies": [
       {
@@ -86,7 +89,7 @@
       },
       {
         "id": "chatplex-sdk-bs",
-        "versionRange": "^6.2.1",
+        "versionRange": "^6.3.0",
         "additionalData": {
           "private": true
         }
@@ -117,12 +120,13 @@
     {
       "dependency": {
         "id": "libil2cpp",
-        "versionRange": "=0.3.1",
+        "versionRange": "=0.3.2",
         "additionalData": {
-          "headersOnly": true
+          "headersOnly": true,
+          "cmake": false
         }
       },
-      "version": "0.3.1"
+      "version": "0.3.2"
     },
     {
       "dependency": {
@@ -144,24 +148,28 @@
     {
       "dependency": {
         "id": "chatplex-sdk-bs",
-        "versionRange": "=6.2.1",
+        "versionRange": "=6.3.0",
         "additionalData": {
+          "soLink": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v6.3.0/libchatplex-sdk-bs.so",
+          "debugSoLink": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v6.3.0/debug_libchatplex-sdk-bs.so",
           "overrideSoName": "libchatplex-sdk-bs.so",
+          "modLink": "https://github.com/hardcpp/QuestChatPlexSDK-BS/releases/download/v6.3.0/ChatPlexSDK-BS.qmod",
+          "branchName": "version/v6_3_0",
           "cmake": true
         }
       },
-      "version": "6.2.1"
+      "version": "6.3.0"
     },
     {
       "dependency": {
         "id": "custom-types",
-        "versionRange": "=0.17.6",
+        "versionRange": "=0.17.7",
         "additionalData": {
-          "soLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.6/libcustom-types.so",
-          "debugSoLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.6/debug_libcustom-types.so",
+          "soLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.7/libcustom-types.so",
+          "debugSoLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.7/debug_libcustom-types.so",
           "overrideSoName": "libcustom-types.so",
-          "modLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.6/CustomTypes.qmod",
-          "branchName": "version/v0_17_6",
+          "modLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.7/CustomTypes.qmod",
+          "branchName": "version/v0_17_7",
           "compileOptions": {
             "cppFlags": [
               "-Wno-invalid-offsetof"
@@ -170,7 +178,7 @@
           "cmake": true
         }
       },
-      "version": "0.17.6"
+      "version": "0.17.7"
     },
     {
       "dependency": {
