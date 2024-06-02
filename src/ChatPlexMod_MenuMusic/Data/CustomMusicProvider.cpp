@@ -119,7 +119,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                     CP_SDK::Utils::StrToU16Str(l_CoverPath),
                     CP_SDK::Utils::StrToU16Str(l_Path.stem().string()),
                     u" ",
-                    ""
+                    u""
                 )));
             }
 

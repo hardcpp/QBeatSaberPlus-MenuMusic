@@ -123,10 +123,11 @@
         "stop_token": "cpp",
         "__std_stream": "cpp",
         "memory_resource": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "__verbose_abort": "cpp"
     },
     "editor.formatOnSave": false,
     "editor.trimAutoWhitespace": true,
     "cmake.configureOnOpen": false,
-    "cmake.automaticReconfigure": true
+    "cmake.automaticReconfigure": false
 }

@@ -35,7 +35,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @param p_SongName      Name of the song
     /// @param p_SongArtist    Artist of the song
     /// @param p_CustomData    Custom data
-    Music::Music(const IMusicProvider::Ptr& p_MusicProvider, std::u16string_view p_SongPath, std::u16string_view p_SongCoverPath, std::u16string_view p_SongName, std::u16string_view p_SongArtist, std::string_view p_CustomData)
+    Music::Music(const IMusicProvider::Ptr& p_MusicProvider, std::u16string_view p_SongPath, std::u16string_view p_SongCoverPath, std::u16string_view p_SongName, std::u16string_view p_SongArtist, std::u16string_view p_CustomData)
     {
         auto f_Trim = [](std::u16string& p_Str) {
             p_Str.erase(p_Str.find_last_not_of(u" \n\r\t")+1);
@@ -79,7 +79,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         return m_SongArtist;
     }
     /// @brief Get custom data
-    std::string_view Music::GetCustomData()
+    std::u16string_view Music::GetCustomData()
     {
         return m_CustomData;
     }
@@ -125,7 +125,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                 }
                 else
                 {
-                    auto l_Raw = IncludedAssets::DefaultCover_png.operator ArrayW<uint8_t, Array<uint8_t> *>();
+                    auto l_Raw = Assets::DefaultCover_png.operator ArrayW<uint8_t, Array<uint8_t> *>();
                     l_Bytes = reinterpret_cast<::Array<uint8_t>*>(l_Raw.convert());
                 }
 
@@ -165,12 +165,12 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         auto l_PathParts = StringW(p_Self->m_SongPath)->Split('/');
         auto l_SafePath  = l_PathParts[0];
 
-        for (auto l_I = 1; l_I < l_PathParts.Length(); ++l_I)
+        for (auto l_I = 1; l_I < l_PathParts->get_Length(); ++l_I)
         {
             auto l_DestPos = 0;
             auto l_Escaped = System::UriHelper::EscapeString(l_PathParts[l_I], 0, l_PathParts[l_I]->get_Length(), nullptr, l_DestPos, true, u'\uffff', u'\uffff', u'\uffff');
 
-            l_SafePath += Il2CppString::New_ctor(l_Escaped, 0, l_DestPos);
+            l_SafePath += StringW(System::String::New_ctor(l_Escaped, 0, l_DestPos));
         }
 
         auto l_FinalURL = "file://" + l_SafePath->Replace("#", "%23");
@@ -200,8 +200,8 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         if (p_Token && p_Token->IsCancelled(l_StartSerial))
             co_return;
 
-        if (l_Loader->get_isNetworkError()
-            || l_Loader->get_isHttpError()
+        if (l_Loader->get_result() == UnityWebRequest::Result::ConnectionError
+            || l_Loader->get_result() == UnityWebRequest::Result::ProtocolError
             || !System::String::IsNullOrEmpty(l_Loader->get_error()))
         {
             Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][Music.GetAudioAsync] Can't load audio! " + (!System::String::IsNullOrEmpty(l_Loader->get_error()) ? l_Loader->get_error() : u""));
@@ -234,7 +234,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         }
 
         auto l_RemainingTry  = 15;
-        auto l_Waiter        = WaitForSecondsRealtime::New_ctor(0.1f)->i_IEnumerator();
+        auto l_Waiter        = WaitForSecondsRealtime::New_ctor(0.1f)->i___System__Collections__IEnumerator();
 
         while (    l_AudioClip->get_loadState() != AudioDataLoadState::Loaded
                 && l_AudioClip->get_loadState() != AudioDataLoadState::Failed)

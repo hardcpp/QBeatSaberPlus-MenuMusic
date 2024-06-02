@@ -53,16 +53,14 @@ namespace ChatPlexMod_MenuMusic::Utils {
 
             if (!m_BackgroundMask)
             {
-                auto l_Bytes = IncludedAssets::BackgroundMask_png.operator ArrayW<uint8_t, Array<uint8_t> *>();
                 int l_Width, l_Height;
-                CP_SDK::Unity::TextureRaw::Load(reinterpret_cast<::Array<uint8_t>*>(l_Bytes.convert()), l_Width, l_Height, &m_BackgroundMask);
+                CP_SDK::Unity::TextureRaw::Load(Assets::BackgroundMask_png, l_Width, l_Height, &m_BackgroundMask);
             }
 
             if (!m_CoverMask)
             {
-                auto l_Bytes  = IncludedAssets::CoverMask_png.operator ArrayW<uint8_t, Array<uint8_t> *>();
                 int l_Width, l_Height;
-                CP_SDK::Unity::TextureRaw::Load(reinterpret_cast<::Array<uint8_t>*>(l_Bytes.convert()), l_Width, l_Height, &m_CoverMask);
+                CP_SDK::Unity::TextureRaw::Load(Assets::CoverMask_png, l_Width, l_Height, &m_CoverMask);
             }
 
             if (p_CancellationToken && p_CancellationToken->IsCancelled(l_StartSerial))
@@ -108,8 +106,8 @@ namespace ChatPlexMod_MenuMusic::Utils {
                 l_CoverPixelsConverted      = ::Array<Color>::NewLength(l_CoverPixels->size());
                 l_BackgroundPixelsConverted = ::Array<Color>::NewLength(l_BackgroundPixels->size());
 
-                memcpy(&l_CoverPixelsConverted->values[0],      &(*l_CoverPixels.get())[0],        sizeof(Color) * l_CoverPixels->size());
-                memcpy(&l_BackgroundPixelsConverted->values[0], &(*l_BackgroundPixels.get())[0],   sizeof(Color) * l_BackgroundPixels->size());
+                memcpy(&l_CoverPixelsConverted->_values[0],      &(*l_CoverPixels.get())[0],        sizeof(Color) * l_CoverPixels->size());
+                memcpy(&l_BackgroundPixelsConverted->_values[0], &(*l_BackgroundPixels.get())[0],   sizeof(Color) * l_BackgroundPixels->size());
             }
             catch (const std::exception& l_Exception)
             {

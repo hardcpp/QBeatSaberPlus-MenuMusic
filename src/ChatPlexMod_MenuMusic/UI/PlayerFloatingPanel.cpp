@@ -8,6 +8,7 @@
 
 #include <CP_SDK/UI/ValueFormatters.hpp>
 #include <CP_SDK/Unity/Extensions/ColorU.hpp>
+#include <CP_SDK/Unity/Operators.hpp>
 #include <CP_SDK/Unity/SpriteU.hpp>
 
 using namespace CP_SDK::Unity::Extensions;
@@ -41,14 +42,14 @@ namespace ChatPlexMod_MenuMusic::UI {
     /// @brief On view creation
     void PlayerFloatingPanel::OnViewCreation_Impl()
     {
-        auto l_NextSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Next_png.Raw());
-        auto l_GlassSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Glass_png.Raw());
-        auto l_PauseSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Pause_png.Raw());
-        auto l_PlaySprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Play_png.Raw());
-        auto l_PlaylistSprite    = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Playlist_png.Raw());
-        auto l_PrevSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Prev_png.Raw());
-        auto l_RandSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Rand_png.Raw());
-        auto l_SoundSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(IncludedAssets::Sound_png.Raw());
+        auto l_NextSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Next_png);
+        auto l_GlassSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Glass_png);
+        auto l_PauseSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Pause_png);
+        auto l_PlaySprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Play_png);
+        auto l_PlaylistSprite    = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Playlist_png);
+        auto l_PrevSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Prev_png);
+        auto l_RandSprite        = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Rand_png);
+        auto l_SoundSprite       = CP_SDK::Unity::SpriteU::CreateFromRaw(Assets::Sound_png);
 
         m_PlaySprite    = l_PlaySprite;
         m_PauseSprite   = l_PauseSprite;

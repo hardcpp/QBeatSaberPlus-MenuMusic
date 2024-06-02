@@ -1,63 +1,14 @@
 #pragma once
+#include "kaleb/shared/kaleb.hpp"
 
-#include <string_view>
-#include "beatsaber-hook/shared/utils/typedefs.h"
-
-struct IncludedAsset {
-
-    IncludedAsset(uint8_t* start, uint8_t* end) : array(reinterpret_cast<Array<uint8_t>*>(start)) {
-        array->klass = nullptr;
-        array->monitor = nullptr;
-        array->bounds = nullptr;
-        array->max_length = end - start - 33;
-        *(end - 1)= '\0';
-    }
-
-    operator ArrayW<uint8_t>() const {
-        init();
-        return array;
-    }
-
-    Array<uint8_t>* Raw() const {
-        init();
-        return array;
-    }
-
-    operator std::string_view() const {
-        return { reinterpret_cast<char*>(array->values), array->Length() };
-    }
-
-    operator std::span<uint8_t>() const {
-        return { array->values, array->Length() };
-    }
-
-    void init() const {
-        if(!array->klass)
-            array->klass = classof(Array<uint8_t>*);
-    }
-
-    private:
-        Array<uint8_t>* array;
-
-};
-
-#define DECLARE_FILE(name)                         \
-    extern "C" uint8_t _binary_##name##_start[];  \
-    extern "C" uint8_t _binary_##name##_end[];    \
-    const IncludedAsset name { _binary_##name##_start, _binary_##name##_end};
-
-namespace IncludedAssets {
-
-	DECLARE_FILE(BackgroundMask_png)
-	DECLARE_FILE(CoverMask_png)
-	DECLARE_FILE(DefaultCover_png)
-	DECLARE_FILE(Glass_png)
-	DECLARE_FILE(Next_png)
-	DECLARE_FILE(Pause_png)
-	DECLARE_FILE(Play_png)
-	DECLARE_FILE(Playlist_png)
-	DECLARE_FILE(Prev_png)
-	DECLARE_FILE(Rand_png)
-	DECLARE_FILE(Sound_png)
-
-}
+DECLARE_FILE(_binary_BackgroundMask_png, Assets, BackgroundMask_png);
+DECLARE_FILE(_binary_CoverMask_png, Assets, CoverMask_png);
+DECLARE_FILE(_binary_DefaultCover_png, Assets, DefaultCover_png);
+DECLARE_FILE(_binary_Glass_png, Assets, Glass_png);
+DECLARE_FILE(_binary_Next_png, Assets, Next_png);
+DECLARE_FILE(_binary_Pause_png, Assets, Pause_png);
+DECLARE_FILE(_binary_Play_png, Assets, Play_png);
+DECLARE_FILE(_binary_Playlist_png, Assets, Playlist_png);
+DECLARE_FILE(_binary_Prev_png, Assets, Prev_png);
+DECLARE_FILE(_binary_Rand_png, Assets, Rand_png);
+DECLARE_FILE(_binary_Sound_png, Assets, Sound_png);
