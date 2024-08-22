@@ -2,8 +2,6 @@
 #include "ChatPlexMod_MenuMusic/UI/SettingsMainView.hpp"
 #include "ChatPlexMod_MenuMusic/MenuMusic.hpp"
 
-#include <UnityEngine/Application.hpp>
-
 using namespace CP_SDK::XUI;
 using namespace UnityEngine;
 
@@ -97,7 +95,7 @@ namespace ChatPlexMod_MenuMusic::UI {
     void SettingsLeftView::OnDocumentationButton()
     {
         ShowMessageModal(u"URL opened in your web browser.");
-        Application::OpenURL(MenuMusic::Instance()->DocumentationURL());
+        CP_SDK::ChatPlexSDK::OpenURL(MenuMusic::Instance()->DocumentationURL());
     }
 
 }   ///< namespace ChatPlexMod_MenuMusic::UI
