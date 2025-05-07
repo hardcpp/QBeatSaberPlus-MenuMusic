@@ -41,6 +41,8 @@ namespace ChatPlexMod_MenuMusic {
         m_CurrentSongIndex              = 0;
 
         m_FastCancellationToken         = CP_SDK::Misc::FastCancellationToken::Make();
+
+        m_LastPlayingRescue             = true;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -63,11 +65,12 @@ namespace ChatPlexMod_MenuMusic {
             m_OriginalAmbientVolumeScale    = m_PreviewPlayer->____ambientVolumeScale;
         }
 
-        UpdateMusicProvider();
-
-        /// Enable at start if in menu
-        if (CP_SDK::ChatPlexSDK::ActiveGenericScene() == CP_SDK::EGenericScene::Menu)
-            ChatPlexSDK_OnGenericSceneChange(CP_SDK::EGenericScene::Menu);
+        if (UpdateMusicProvider(true))
+        {
+            /// Enable at start if in menu
+            if (CP_SDK::ChatPlexSDK::ActiveGenericScene() == CP_SDK::EGenericScene::Menu)
+                ChatPlexSDK_OnGenericSceneChange(CP_SDK::EGenericScene::Menu);
+        }
     }
     /// @brief Disable the Module
     void MenuMusic::OnDisable()
@@ -126,6 +129,7 @@ namespace ChatPlexMod_MenuMusic {
                 m_PreviewPlayer->____defaultAudioClip = m_OriginalMenuMusic.Ptr(false);
 
             DestroyFloatingPlayer();
+            m_LastActiveScene = p_Scene;
             return;
         }
 
@@ -137,10 +141,12 @@ namespace ChatPlexMod_MenuMusic {
         m_PreviewPlayer->____volumeScale        = 0.0f;
 
         /// Start a new music
-        if (MMConfig::Instance()->StartANewMusicOnSceneChange)
+        if (p_Scene != m_LastActiveScene && MMConfig::Instance()->StartANewMusicOnSceneChange)
             StartNewMusic(false, true);
         else
             LoadNextMusic(true);
+
+        m_LastActiveScene = p_Scene;
     }
     /// @brief Application wants to quit
     bool MenuMusic::Application_wantsToQuit()
@@ -155,8 +161,13 @@ namespace ChatPlexMod_MenuMusic {
     ////////////////////////////////////////////////////////////////////////////
 
     /// @brief Update the music provider
-    void MenuMusic::UpdateMusicProvider()
+    /// @param p_SkipIfAlreadySet Skip if a music provider already exist
+    /// @return bool True if a new music provider is set
+    bool MenuMusic::UpdateMusicProvider(bool p_SkipIfAlreadySet)
     {
+        if (p_SkipIfAlreadySet && m_MusicProvider != nullptr)
+            return false;
+
         switch (MMConfig::Instance()->MusicProvider)
         {
             case Data::MusicProviderType::E::CustomMusic:
@@ -171,6 +182,7 @@ namespace ChatPlexMod_MenuMusic {
         }
 
         StartNewMusic();
+        return true;
     }
     /// @brief Update playback volume
     /// @param p_FromConfig From config?
@@ -371,6 +383,24 @@ namespace ChatPlexMod_MenuMusic {
 
         m_CurrentSongIndex++;
 
+        if (m_LastPlayingRescue)
+        {
+            auto l_SongIndex = -1;
+            for (auto l_I = 0; l_I < m_MusicProvider->Musics().size(); ++l_I)
+            {
+                if (m_MusicProvider->Musics()[l_I]->GetSongPath() != MMConfig::Instance()->LastPlayingSongPath)
+                    continue;
+
+                l_SongIndex = l_I;
+                break;
+            }
+
+            if (l_SongIndex != -1)
+                m_CurrentSongIndex = l_SongIndex;
+
+            m_LastPlayingRescue = false;
+        }
+
         /// Load and play audio clip
         LoadNextMusic(p_OnSceneTransition);
     }
@@ -410,6 +440,10 @@ namespace ChatPlexMod_MenuMusic {
         if (m_CurrentSongIndex >= m_MusicProvider->Musics().size()) m_CurrentSongIndex = 0;
 
         auto& l_MusicToLoad = m_MusicProvider->Musics()[m_CurrentSongIndex];
+
+        /// Save
+        MMConfig::Instance()->LastPlayingSongPath = l_MusicToLoad->GetSongPath();
+        MMConfig::Instance()->Save();
 
         m_FastCancellationToken->Cancel();
         l_MusicToLoad->GetAudioAsync(

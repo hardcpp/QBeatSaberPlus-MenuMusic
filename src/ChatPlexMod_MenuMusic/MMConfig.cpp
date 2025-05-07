@@ -38,6 +38,7 @@ namespace ChatPlexMod_MenuMusic {
         CP_SDK_JSON_SERIALIZE_BOOL(LoopCurrentMusic);
         CP_SDK_JSON_SERIALIZE_BOOL(UseOnlyCustomMenuSongsFolder);
         CP_SDK_JSON_SERIALIZE_FLOAT(PlaybackVolume);
+        CP_SDK_JSON_SERIALIZE_STRING(LastPlayingSongPath);
     }
     /// @brief Read the document
     /// @param p_Document Source
@@ -51,6 +52,7 @@ namespace ChatPlexMod_MenuMusic {
         CP_SDK_JSON_UNSERIALIZE_BOOL(LoopCurrentMusic);
         CP_SDK_JSON_UNSERIALIZE_BOOL(UseOnlyCustomMenuSongsFolder);
         CP_SDK_JSON_UNSERIALIZE_FLOAT(PlaybackVolume);
+        CP_SDK_JSON_UNSERIALIZE_STRING(LastPlayingSongPath);
     }
 
     ////////////////////////////////////////////////////////////////////////////

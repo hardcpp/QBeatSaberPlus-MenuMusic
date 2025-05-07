@@ -3,6 +3,7 @@
 #include "Data/EMusicProviderType.hpp"
 
 #include <CP_SDK/Config/JsonConfig.hpp>
+#include <string>
 
 namespace ChatPlexMod_MenuMusic {
 
@@ -17,11 +18,12 @@ namespace ChatPlexMod_MenuMusic {
 
             bool ShowPlayer = true;
 
-            bool    StartSongFromBeginning          = false;
-            bool    StartANewMusicOnSceneChange     = true;
-            bool    LoopCurrentMusic                = false;
-            bool    UseOnlyCustomMenuSongsFolder    = false;
-            float   PlaybackVolume                  = 0.5f;
+            bool            StartSongFromBeginning          = false;
+            bool            StartANewMusicOnSceneChange     = true;
+            bool            LoopCurrentMusic                = false;
+            bool            UseOnlyCustomMenuSongsFolder    = false;
+            float           PlaybackVolume                  = 0.5f;
+            std::u16string  LastPlayingSongPath             = u"";
 
         protected:
             /// @brief Reset config to default
