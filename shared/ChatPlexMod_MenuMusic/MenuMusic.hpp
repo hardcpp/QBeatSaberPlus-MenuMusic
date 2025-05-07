@@ -66,6 +66,9 @@ namespace ChatPlexMod_MenuMusic {
             CP_SDK::Utils::MonoPtr<Coroutine>           m_WaitUntillReadyCoroutine;
             CP_SDK::Misc::FastCancellationToken::Ptr    m_FastCancellationToken;
 
+            CP_SDK::EGenericScene                       m_LastActiveScene;
+            bool                                        m_LastPlayingRescue;
+
         public:
             /// @brief Constructor
             MenuMusic();
@@ -89,7 +92,9 @@ namespace ChatPlexMod_MenuMusic {
 
         public:
             /// @brief Update the music provider
-            void UpdateMusicProvider();
+            /// @param p_SkipIfAlreadySet Skip if a music provider already exist
+            /// @return bool True if a new music provider is set
+            bool UpdateMusicProvider(bool p_SkipIfAlreadySet = false);
             /// @brief Update playback volume
             /// @param p_FromConfig From config?
             void UpdatePlaybackVolume(bool p_FromConfig);
