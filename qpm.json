@@ -1,101 +1,101 @@
 {
-  "version": "0.4.0",
-  "sharedDir": "shared",
-  "dependenciesDir": "extern",
-  "info": {
-    "name": "QBeatSaberPlus-MenuMusic",
-    "id": "qbeatsaberplus-menumusic",
-    "version": "6.4.0",
-    "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
-    "additionalData": {
-      "overrideSoName": "libqbeatsaberplus-menumusic.so",
-      "cmake": true
-    }
-  },
-  "workspace": {
-    "scripts": {
-      "build": [
-        "pwsh ./build.ps1"
-      ],
-      "clean": [
-        "pwsh ./build.ps1 -clean"
-      ],
-      "copy": [
-        "pwsh ./copy.ps1"
-      ],
-      "log": [
-        "pwsh ./start-logging.ps1"
-      ],
-      "qmod": [
-        "pwsh ./build.ps1 -clean",
-        "pwsh ./createqmod.ps1 -clean"
-      ],
-      "qmod_backup": [
-        "pwsh ./build.ps1 -clean",
-        "qpm qmod build",
-        "pwsh ./createqmod.ps1 -clean"
-      ]
-    },
-    "ndk": "^27.2.12479018",
-    "qmodIncludeDirs": [
-      "build",
-      "extern/libs"
-    ],
-    "qmodIncludeFiles": [],
-    "qmodOutput": "./QBeatSaberPlus-MenuMusic.qmod"
-  },
-  "dependencies": [
-    {
-      "id": "beatsaber-hook",
-      "versionRange": "^6.4.1",
-      "additionalData": {}
-    },
-    {
-      "id": "bs-cordl",
-      "versionRange": "^4004.0.0",
-      "additionalData": {}
-    },
-    {
-      "id": "custom-types",
-      "versionRange": "^0.18.2",
-      "additionalData": {}
-    },
-    {
-      "id": "scotland2",
-      "versionRange": "^0.1.6",
+    "version": "0.4.0",
+    "sharedDir": "shared",
+    "dependenciesDir": "extern",
+    "info": {
+      "name": "QBeatSaberPlus-MenuMusic",
+      "id": "qbeatsaberplus-menumusic",
+      "version": "6.4.0",
+      "url": "https://github.com/hardcpp/QBeatSaberPlus-MenuMusic",
       "additionalData": {
-        "includeQmod": false,
-        "private": true
+        "overrideSoName": "libqbeatsaberplus-menumusic.so",
+        "cmake": true
       }
     },
-    {
-      "id": "libil2cpp",
-      "versionRange": "^0.4.0",
-      "additionalData": {}
+    "workspace": {
+      "scripts": {
+        "build": [
+          "pwsh ./build.ps1"
+        ],
+        "clean": [
+          "pwsh ./build.ps1 -clean"
+        ],
+        "copy": [
+          "pwsh ./copy.ps1"
+        ],
+        "log": [
+          "pwsh ./start-logging.ps1"
+        ],
+        "qmod": [
+          "pwsh ./build.ps1 -clean",
+          "pwsh ./createqmod.ps1 -clean"
+        ],
+        "qmod_backup": [
+          "pwsh ./build.ps1 -clean",
+          "qpm qmod build",
+          "pwsh ./createqmod.ps1 -clean"
+        ]
+      },
+      "ndk": "^27.2.12479018",
+      "qmodIncludeDirs": [
+        "build",
+        "extern/libs"
+      ],
+      "qmodIncludeFiles": [],
+      "qmodOutput": "./QBeatSaberPlus-MenuMusic.qmod"
     },
-    {
-      "id": "songcore",
-      "versionRange": "^1.1.20",
-      "additionalData": {
-        "private": true
+    "dependencies": [
+      {
+        "id": "beatsaber-hook",
+        "versionRange": "^6.4.1",
+        "additionalData": {}
+      },
+      {
+        "id": "bs-cordl",
+        "versionRange": "^4004.0.0",
+        "additionalData": {}
+      },
+      {
+        "id": "custom-types",
+        "versionRange": "^0.18.2",
+        "additionalData": {}
+      },
+      {
+        "id": "scotland2",
+        "versionRange": "^0.1.6",
+        "additionalData": {
+          "includeQmod": false,
+          "private": true
+        }
+      },
+      {
+        "id": "libil2cpp",
+        "versionRange": "^0.4.0",
+        "additionalData": {}
+      },
+      {
+        "id": "songcore",
+        "versionRange": "^1.1.20",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "paper2_scotland2",
+        "versionRange": "^4.6.1",
+        "additionalData": {}
+      },
+      {
+        "id": "kaleb",
+        "versionRange": "^0.1.9",
+        "additionalData": {}
+      },
+      {
+        "id": "chatplex-sdk-bs",
+        "versionRange": "^6.4.0",
+        "additionalData": {
+          "private": true
+        }
       }
-    },
-    {
-      "id": "paper2_scotland2",
-      "versionRange": "^4.6.1",
-      "additionalData": {}
-    },
-    {
-      "id": "kaleb",
-      "versionRange": "^0.1.9",
-      "additionalData": {}
-    },
-    {
-      "id": "chatplex-sdk-bs",
-      "versionRange": "^6.4.0",
-      "additionalData": {
-        "private": true
-      }
-    }
-  ]
-}
+    ]
+  }
