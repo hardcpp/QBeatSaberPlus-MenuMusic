@@ -8,6 +8,7 @@
 #include <songcore/shared/SongCore.hpp>
 
 #include <filesystem>
+#include <cctype>
 
 #include <GlobalNamespace/BeatmapLevel.hpp>
 #include <GlobalNamespace/FileSystemPreviewMediaData.hpp>
@@ -98,17 +99,21 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         while (!SongCore::API::Loading::AreSongsLoaded())
             co_yield nullptr;
 
-        auto l_Self = *reinterpret_cast<std::shared_ptr<GameMusicProvider>*>(&p_Self);
+        auto l_Self = std::static_pointer_cast<GameMusicProvider>(p_Self);
         try
         {
             const auto l_LoadedSongs = SongCore::API::Loading::GetAllLevels();
+            std::size_t l_ProcessedSongs = 0;
             for (auto& l_Current : l_LoadedSongs)
             {
-                auto l_FileSystemPreviewMediaData = il2cpp_utils::try_cast<FileSystemPreviewMediaData>(l_Current->___previewMediaData);
+                if (++l_ProcessedSongs % 32 == 0)
+                    co_yield nullptr;
+
+                auto l_FileSystemPreviewMediaData = il2cpp_utils::try_cast<FileSystemPreviewMediaData>(l_Current->previewMediaData);
                 if (!l_FileSystemPreviewMediaData.has_value())
                     continue;
 
-                auto l_Extension = std::filesystem::path(l_FileSystemPreviewMediaData.value()->____previewAudioClipPath).extension().string();
+                auto l_Extension = std::filesystem::path(l_FileSystemPreviewMediaData.value()->_previewAudioClipPath).extension().string();
                 std::transform(l_Extension.begin(), l_Extension.end(), l_Extension.begin(), ::tolower);
 
                 if (l_Extension != ".egg" && l_Extension != ".ogg")
@@ -116,23 +121,25 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
 
                 l_Self->m_Musics.push_back(std::shared_ptr<Music>(new Music(
                     l_Self,
-                    l_FileSystemPreviewMediaData.value()->____previewAudioClipPath,
-                    l_FileSystemPreviewMediaData.value()->____coverSpritePath,
-                    l_Current->___songName,
-                    l_Current->___songAuthorName,
-                    l_Current->___levelID.operator std::__ndk1::u16string_view()
+                    l_FileSystemPreviewMediaData.value()->_previewAudioClipPath,
+                    l_FileSystemPreviewMediaData.value()->_coverSpritePath,
+                    l_Current->songName,
+                    l_Current->songAuthorName,
+                    l_Current->levelID.operator std::__ndk1::u16string_view()
                 )));
             }
 
             l_Self->Shuffle();
 
-            l_Self->m_IsLoading = false;
         }
         catch(const std::exception& p_Exception)
         {
             Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][GameMusicProvider.Coroutine_LoadGameSongs] Error:");
             Logger::Instance->Error(p_Exception);
         }
+
+        /// Always release waiters, even if one malformed song caused an exception.
+        l_Self->m_IsLoading = false;
     }
 
 }   ///< namespace Data
