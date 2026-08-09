@@ -71,6 +71,7 @@ foreach ($fileName in $modFiles) {
     }
 }
 
+
 & $PSScriptRoot/restart-game.ps1
 
 if ($log -eq $true) {

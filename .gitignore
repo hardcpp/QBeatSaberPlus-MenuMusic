@@ -67,3 +67,5 @@ extern.cmake
 
 # QMOD Schema
 mod.json.schema
+
+.env
