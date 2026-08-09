@@ -20,9 +20,9 @@ using namespace UnityEngine::Networking;
 
 namespace ChatPlexMod_MenuMusic { namespace Data {
 
-    const IMusicProvider::Ptr& Music::MusicProvider()
+    IMusicProvider::Ptr Music::MusicProvider()
     {
-        return m_MusicProvider;
+        return m_MusicProvider.lock();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -109,18 +109,19 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                                     CP_SDK::Utils::CActionRef<CP_SDK::Utils::CMonoPtrRef<::Array<uint8_t>>> p_OnSuccess,
                                     CP_SDK::Utils::CActionRef<>                                             p_OnError)
     {
-        auto l_StartSerial = p_Token->Serial();
-        CP_SDK::Unity::MTThreadInvoker::EnqueueOnThread([this, p_Token, p_OnSuccess, p_OnError, l_StartSerial]() -> void
+        auto l_StartSerial = p_Token ? p_Token->Serial() : 0;
+        auto l_Self        = shared_from_this();
+        CP_SDK::Unity::MTThreadInvoker::EnqueueOnThread([l_Self, p_Token, p_OnSuccess, p_OnError, l_StartSerial]() -> void
         {
-            if (p_Token->IsCancelled(l_StartSerial))
+            if (p_Token && p_Token->IsCancelled(l_StartSerial))
                 return;
 
             try
             {
                 CP_SDK::Utils::MonoPtr<Array<uint8_t>> l_Bytes;
-                if (System::IO::File::Exists(m_SongCoverPath))
+                if (System::IO::File::Exists(l_Self->m_SongCoverPath))
                 {
-                    auto l_Raw = System::IO::File::ReadAllBytes(m_SongCoverPath);
+                    auto l_Raw = System::IO::File::ReadAllBytes(l_Self->m_SongCoverPath);
                     l_Bytes = reinterpret_cast<::Array<uint8_t>*>(l_Raw.convert());
                 }
                 else
@@ -129,7 +130,7 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
                     l_Bytes = reinterpret_cast<::Array<uint8_t>*>(l_Raw.convert());
                 }
 
-                if (p_Token->IsCancelled(l_StartSerial))
+                if (p_Token && p_Token->IsCancelled(l_StartSerial))
                     return;
 
                 p_OnSuccess(l_Bytes);
@@ -188,6 +189,10 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             Logger::Instance->Error(l_Exception);
 
             p_OnError();
+
+            if (l_Loader)
+                l_Loader->Dispose();
+
             co_return;
         }
 
@@ -195,10 +200,20 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
 
         /// Skip if it's not the menu
         if (CP_SDK::ChatPlexSDK::ActiveGenericScene() != CP_SDK::EGenericScene::Menu)
+        {
+            if (l_Loader)
+                l_Loader->Dispose();
+
             co_return;
+        }
 
         if (p_Token && p_Token->IsCancelled(l_StartSerial))
+        {
+            if (l_Loader)
+                l_Loader->Dispose();
+
             co_return;
+        }
 
         if (l_Loader->get_result() == UnityWebRequest::Result::ConnectionError
             || l_Loader->get_result() == UnityWebRequest::Result::ProtocolError
@@ -206,6 +221,10 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         {
             Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][Music.GetAudioAsync] Can't load audio! " + (!System::String::IsNullOrEmpty(l_Loader->get_error()) ? l_Loader->get_error() : u""));
             p_OnError();
+
+            if (l_Loader)
+                l_Loader->Dispose();
+
             co_return;
         }
 
@@ -221,6 +240,10 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             {
                 Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][Music.GetAudioAsync] No audio found");
                 p_OnError();
+
+                if (l_Loader)
+                    l_Loader->Dispose();
+
                 co_return;
             }
         }
@@ -230,6 +253,10 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             Logger::Instance->Error(l_Exception);
 
             p_OnError();
+
+            if (l_Loader)
+                l_Loader->Dispose();
+
             co_return;
         }
 
@@ -245,12 +272,24 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
             if (l_RemainingTry < 0)
             {
                 p_OnError();
+
+                if (l_Loader)
+                    l_Loader->Dispose();
+
                 co_return;
             }
 
             if (p_Token && p_Token->IsCancelled(l_StartSerial))
+            {
+                if (l_Loader)
+                    l_Loader->Dispose();
+
                 co_return;
+            }
         }
+
+        if (l_Loader)
+            l_Loader->Dispose();
 
         if (CP_SDK::ChatPlexSDK::ActiveGenericScene() != CP_SDK::EGenericScene::Menu)
             co_return;

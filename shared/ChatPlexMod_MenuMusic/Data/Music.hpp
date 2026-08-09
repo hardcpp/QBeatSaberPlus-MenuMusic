@@ -22,15 +22,15 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
         CP_SDK_NO_DEF_CTORS(Music);
 
         private:
-            IMusicProvider::Ptr m_MusicProvider;
-            std::u16string      m_SongPath;
-            std::u16string      m_SongCoverPath;
-            std::u16string      m_SongName;
-            std::u16string      m_SongArtist;
-            std::u16string      m_CustomData;
+            std::weak_ptr<IMusicProvider> m_MusicProvider;
+            std::u16string                m_SongPath;
+            std::u16string                m_SongCoverPath;
+            std::u16string                m_SongName;
+            std::u16string                m_SongArtist;
+            std::u16string                m_CustomData;
 
         public:
-            const IMusicProvider::Ptr& MusicProvider();
+            IMusicProvider::Ptr MusicProvider();
 
         public:
             using Ptr = std::shared_ptr<Music>;
