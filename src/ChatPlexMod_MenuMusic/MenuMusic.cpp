@@ -34,15 +34,16 @@ namespace ChatPlexMod_MenuMusic {
     /// Constructor
     MenuMusic::MenuMusic()
     {
-        m_OriginalAmbientVolumeScale    = 1.0f;
-        m_BackupTime                    = 0.0f;
-        m_IsPaused                      = false;
+        m_WantsToQuit                = false;
+        m_OriginalAmbientVolumeScale = 1.0f;
+        m_BackupTime                 = 0.0f;
+        m_IsPaused                   = false;
 
-        m_CurrentSongIndex              = 0;
+        m_CurrentSongIndex      = 0;
+        m_FastCancellationToken = CP_SDK::Misc::FastCancellationToken::Make();
 
-        m_FastCancellationToken         = CP_SDK::Misc::FastCancellationToken::Make();
-
-        m_LastPlayingRescue             = true;
+        m_LastActiveScene           = CP_SDK::EGenericScene::None;
+        m_LastPlayingRescue         = true;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -51,6 +52,8 @@ namespace ChatPlexMod_MenuMusic {
     /// @brief Enable the Module
     void MenuMusic::OnEnable()
     {
+        m_WantsToQuit = false;
+
         /// Bind event
         CP_SDK::ChatPlexSDK::OnGenericSceneChange += {this, &MenuMusic::ChatPlexSDK_OnGenericSceneChange};
         /// Application.wantsToQuit                             += Application_wantsToQuit;
@@ -61,13 +64,13 @@ namespace ChatPlexMod_MenuMusic {
         /// Backup original settings
         if (m_PreviewPlayer)
         {
-            m_OriginalMenuMusic             = m_PreviewPlayer->____defaultAudioClip;
-            m_OriginalAmbientVolumeScale    = m_PreviewPlayer->____ambientVolumeScale;
+            m_OriginalMenuMusic             = m_PreviewPlayer->_defaultAudioClip;
+            m_OriginalAmbientVolumeScale    = m_PreviewPlayer->_ambientVolumeScale;
         }
 
         if (UpdateMusicProvider(true))
         {
-            /// Enable at start if in menu
+            /// Enable at start if in menu.
             if (CP_SDK::ChatPlexSDK::ActiveGenericScene() == CP_SDK::EGenericScene::Menu)
                 ChatPlexSDK_OnGenericSceneChange(CP_SDK::EGenericScene::Menu);
         }
@@ -95,8 +98,8 @@ namespace ChatPlexMod_MenuMusic {
         /// Restore original settings
         if (!m_WantsToQuit && m_PreviewPlayer && m_OriginalMenuMusic)
         {
-            m_PreviewPlayer->____defaultAudioClip   = m_OriginalMenuMusic.Ptr();
-            m_PreviewPlayer->____ambientVolumeScale = m_OriginalAmbientVolumeScale;
+            m_PreviewPlayer->_defaultAudioClip   = m_OriginalMenuMusic.Ptr();
+            m_PreviewPlayer->_ambientVolumeScale = m_OriginalAmbientVolumeScale;
             m_PreviewPlayer->CrossfadeToDefault();
         }
         else if (m_WantsToQuit && m_PreviewPlayer)
@@ -126,7 +129,7 @@ namespace ChatPlexMod_MenuMusic {
         if (p_Scene != CP_SDK::EGenericScene::Menu)
         {
             if (m_PreviewPlayer && m_OriginalMenuMusic)
-                m_PreviewPlayer->____defaultAudioClip = m_OriginalMenuMusic.Ptr(false);
+                m_PreviewPlayer->_defaultAudioClip = m_OriginalMenuMusic.Ptr(false);
 
             DestroyFloatingPlayer();
             m_LastActiveScene = p_Scene;
@@ -137,8 +140,14 @@ namespace ChatPlexMod_MenuMusic {
         if (MMConfig::Instance()->ShowPlayer)
             CreateFloatingPlayer();
 
-        m_PreviewPlayer->____ambientVolumeScale = 0.0f;
-        m_PreviewPlayer->____volumeScale        = 0.0f;
+        if (!m_PreviewPlayer)
+        {
+            Logger::Instance->Error(u"[MenuMusic] SongPreviewPlayer is not available in the menu scene yet.");
+            return;
+        }
+
+        m_PreviewPlayer->_ambientVolumeScale = 0.0f;
+        m_PreviewPlayer->_volumeScale        = 0.0f;
 
         /// Start a new music
         if (p_Scene != m_LastActiveScene && MMConfig::Instance()->StartANewMusicOnSceneChange)
@@ -194,25 +203,31 @@ namespace ChatPlexMod_MenuMusic {
         auto& l_Modules = CP_SDK::ChatPlexSDK::GetModules();
         if (std::count_if(l_Modules.begin(), l_Modules.end(), [](auto x) { return x->Name() == u"Audio Tweaker"; }))
         {
-            auto l_ChannelsController = m_PreviewPlayer->____audioSourceControllers;
+            auto l_ChannelsController = m_PreviewPlayer->_audioSourceControllers;
             if (l_ChannelsController && l_ChannelsController.size())
             {
                 for (auto l_I = 0; l_I < l_ChannelsController->get_Length(); ++l_I)
                 {
                     auto l_ChannelController = l_ChannelsController[l_I];
-                    auto l_Channel           = l_ChannelController->___audioSource;
+                    if (!l_ChannelController)
+                        continue;
+
+                    auto l_Channel = l_ChannelController->audioSource;
+                    if (!l_Channel)
+                        continue;
+
                     if (l_Channel->get_isPlaying() && l_Channel->get_clip() == m_CurrentMusicAudioClip)
                     {
-                        m_PreviewPlayer->____ambientVolumeScale = 1.0f;
-                        m_PreviewPlayer->____volumeScale        = 1.0f;
+                        m_PreviewPlayer->_ambientVolumeScale = 1.0f;
+                        m_PreviewPlayer->_volumeScale        = 1.0f;
                     }
                 }
             }
         }
         else
         {
-            m_PreviewPlayer->____ambientVolumeScale = MMConfig::Instance()->PlaybackVolume;
-            m_PreviewPlayer->____volumeScale        = MMConfig::Instance()->PlaybackVolume;
+            m_PreviewPlayer->_ambientVolumeScale = MMConfig::Instance()->PlaybackVolume;
+            m_PreviewPlayer->_volumeScale        = MMConfig::Instance()->PlaybackVolume;
         }
 
         if (p_FromConfig && m_PlayerFloatingPanelView)
@@ -288,7 +303,7 @@ namespace ChatPlexMod_MenuMusic {
         try
         {
             m_Instance->m_PlayerFloatingPanel = CP_SDK::UI::UISystem::FloatingPanelFactory->Create(u"ChatPlexMod_MenuMusic", l_ScreenContainer->get_transform());
-            m_Instance->m_PlayerFloatingPanel->SetSize(Vector2(80.0f, 20.0f));
+            m_Instance->m_PlayerFloatingPanel->SetSize(Vector2(90.0f, 20.0f));
             m_Instance->m_PlayerFloatingPanel->SetRadius(140.0f);
             m_Instance->m_PlayerFloatingPanel->SetTransformDirect(l_PlayerPosition, Vector3(0.0f, 0.0f, 0.0f));
             m_Instance->m_PlayerFloatingPanel->SetBackground(false);
@@ -341,6 +356,9 @@ namespace ChatPlexMod_MenuMusic {
     /// @brief Start a previous music
     void MenuMusic::StartPreviousMusic()
     {
+        if (!m_MusicProvider)
+            return;
+
         if (!m_MusicProvider->IsReady())
         {
             if (m_WaitUntillReadyCoroutine)
@@ -356,8 +374,8 @@ namespace ChatPlexMod_MenuMusic {
         m_CurrentSongIndex--;
 
         /// Handle overflow
-        if (m_CurrentSongIndex < 0)                                 m_CurrentSongIndex = m_MusicProvider->Musics().size() - 1;
-        if (m_CurrentSongIndex >= m_MusicProvider->Musics().size()) m_CurrentSongIndex = 0;
+        if (m_CurrentSongIndex < 0)                                                   m_CurrentSongIndex = static_cast<int>(m_MusicProvider->Musics().size()) - 1;
+        if (m_CurrentSongIndex >= static_cast<int>(m_MusicProvider->Musics().size())) m_CurrentSongIndex = 0;
 
         /// Load and play audio clip
         LoadNextMusic(false);
@@ -367,6 +385,9 @@ namespace ChatPlexMod_MenuMusic {
     /// @param p_OnSceneTransition On scene transition?
     void MenuMusic::StartNewMusic(bool p_Random, bool p_OnSceneTransition)
     {
+        if (!m_MusicProvider)
+            return;
+
         if (!m_MusicProvider->IsReady())
         {
             if (m_WaitUntillReadyCoroutine)
@@ -386,12 +407,12 @@ namespace ChatPlexMod_MenuMusic {
         if (m_LastPlayingRescue)
         {
             auto l_SongIndex = -1;
-            for (auto l_I = 0; l_I < m_MusicProvider->Musics().size(); ++l_I)
+            for (std::size_t l_I = 0; l_I < m_MusicProvider->Musics().size(); ++l_I)
             {
                 if (m_MusicProvider->Musics()[l_I]->GetSongPath() != MMConfig::Instance()->LastPlayingSongPath)
                     continue;
 
-                l_SongIndex = l_I;
+                l_SongIndex = static_cast<int>(l_I);
                 break;
             }
 
@@ -407,6 +428,9 @@ namespace ChatPlexMod_MenuMusic {
     /// @brief Start a next music
     void MenuMusic::StartNextMusic()
     {
+        if (!m_MusicProvider)
+            return;
+
         if (!m_MusicProvider->IsReady())
         {
             if (m_WaitUntillReadyCoroutine)
@@ -432,12 +456,12 @@ namespace ChatPlexMod_MenuMusic {
     /// @param p_OnSceneTransition Is on scene transition?
     void MenuMusic::LoadNextMusic(bool p_OnSceneTransition)
     {
-        if (m_MusicProvider->Musics().empty())
+        if (!m_MusicProvider || m_MusicProvider->Musics().empty())
             return;
 
         /// Handle overflow
-        if (m_CurrentSongIndex < 0)                                 m_CurrentSongIndex = m_MusicProvider->Musics().size() - 1;
-        if (m_CurrentSongIndex >= m_MusicProvider->Musics().size()) m_CurrentSongIndex = 0;
+        if (m_CurrentSongIndex < 0)                                                   m_CurrentSongIndex = static_cast<int>(m_MusicProvider->Musics().size()) - 1;
+        if (m_CurrentSongIndex >= static_cast<int>(m_MusicProvider->Musics().size())) m_CurrentSongIndex = 0;
 
         auto& l_MusicToLoad = m_MusicProvider->Musics()[m_CurrentSongIndex];
 
@@ -469,6 +493,7 @@ namespace ChatPlexMod_MenuMusic {
         while (!m_Instance->m_MusicProvider || !m_Instance->m_MusicProvider->IsReady())
             co_yield nullptr;
 
+        m_Instance->m_WaitUntillReadyCoroutine = nullptr;
         p_Callback();
     }
     /// @brief Load the song into the preview player
@@ -481,8 +506,6 @@ namespace ChatPlexMod_MenuMusic {
             m_Instance->m_WaitAndPlayNextSongCoroutine = nullptr;
         }
 
-        co_yield nullptr;
-
         /// Skip if it's not the menu
         if (CP_SDK::ChatPlexSDK::ActiveGenericScene() != CP_SDK::EGenericScene::Menu)
             co_return;
@@ -490,13 +513,13 @@ namespace ChatPlexMod_MenuMusic {
         while (!m_Instance->m_PreviewPlayer)
         {
             co_yield nullptr;
-            m_Instance->m_PreviewPlayer = Resources::FindObjectsOfTypeAll<SongPreviewPlayer*>()->First();
+            m_Instance->m_PreviewPlayer = Resources::FindObjectsOfTypeAll<SongPreviewPlayer*>()->FirstOrDefault();
         }
 
         if (p_OnSceneTransition)
         {
             if (m_Instance->m_PreviewPlayer)
-                m_Instance->m_PreviewPlayer->FadeOut(m_Instance->m_PreviewPlayer->____crossFadeToDefaultSpeed);
+                m_Instance->m_PreviewPlayer->FadeOut(m_Instance->m_PreviewPlayer->_crossFadeToDefaultSpeed);
 
             co_yield WaitForSecondsRealtime::New_ctor(2.0f)->i___System__Collections__IEnumerator();
         }
@@ -533,15 +556,15 @@ namespace ChatPlexMod_MenuMusic {
                         m_Instance->m_WaitAndPlayNextSongCoroutine = nullptr;
                     }
 
-                    m_Instance->m_PreviewPlayer->____defaultAudioClip = m_Instance->m_CurrentMusicAudioClip.Ptr();
+                    m_Instance->m_PreviewPlayer->_defaultAudioClip = m_Instance->m_CurrentMusicAudioClip.Ptr();
 
                     auto  l_Volume  = MMConfig::Instance()->PlaybackVolume;
                     auto& l_Modules = CP_SDK::ChatPlexSDK::GetModules();
                     if (std::count_if(l_Modules.begin(), l_Modules.end(), [](auto x) { return x->Name() == u"Audio Tweaker"; }))
                         l_Volume = 1.0f;
 
-                    m_Instance->m_PreviewPlayer->____ambientVolumeScale = l_Volume;
-                    m_Instance->m_PreviewPlayer->____volumeScale        = l_Volume;
+                    m_Instance->m_PreviewPlayer->_ambientVolumeScale = l_Volume;
+                    m_Instance->m_PreviewPlayer->_volumeScale        = l_Volume;
 
                     float l_StartTime = (MMConfig::Instance()->StartSongFromBeginning || m_Instance->m_CurrentMusicAudioClip->get_length() < 60)
                                         ?
@@ -604,12 +627,17 @@ namespace ChatPlexMod_MenuMusic {
                 co_return;
             }
 
-            auto l_ChannelsController = m_Instance->m_PreviewPlayer->____audioSourceControllers;
+            auto l_ChannelsController = m_Instance->m_PreviewPlayer->_audioSourceControllers;
             if (l_ChannelsController.size() > 0)
             {
                 for (auto l_ChannelController : l_ChannelsController)
                 {
-                    auto l_Channel = l_ChannelController->___audioSource;
+                    if (!l_ChannelController)
+                        continue;
+
+                    auto l_Channel = l_ChannelController->audioSource;
+                    if (!l_Channel)
+                        continue;
 
                     if (   !m_Instance->m_IsPaused
                         && !l_Channel->get_isPlaying()
@@ -640,8 +668,8 @@ namespace ChatPlexMod_MenuMusic {
                             if (std::count_if(l_Modules.begin(), l_Modules.end(), [](auto x) { return x->Name() == u"Audio Tweaker"; }))
                                 l_Volume = 1.0f;
 
-                            m_Instance->m_PreviewPlayer->____ambientVolumeScale = l_Volume;
-                            m_Instance->m_PreviewPlayer->____volumeScale        = l_Volume;
+                            m_Instance->m_PreviewPlayer->_ambientVolumeScale = l_Volume;
+                            m_Instance->m_PreviewPlayer->_volumeScale        = l_Volume;
                         }
 
                         if (Mathf::Abs(p_EndTime - l_Channel->get_time()) < (MMConfig::Instance()->LoopCurrentMusic ? l_Interval : 3.0f))

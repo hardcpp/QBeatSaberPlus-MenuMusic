@@ -1,8 +1,8 @@
 Param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Switch] $clean,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [Switch] $help
 )
 
@@ -25,7 +25,10 @@ if ($clean.IsPresent) {
 
 if (($clean.IsPresent) -or (-not (Test-Path -Path "build"))) {
     new-item -Path build -ItemType Directory
-} 
+}
 
 & cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -B build
-& cmake --build ./build
+& cmake --build ./build --parallel 12
+
+$ExitCode = $LastExitCode
+exit $ExitCode

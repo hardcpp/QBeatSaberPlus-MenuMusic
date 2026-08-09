@@ -8,6 +8,7 @@
 #include <UnityEngine/Color.hpp>
 #include <UnityEngine/Sprite.hpp>
 
+#include <mutex>
 #include <stdint.h>
 
 namespace ChatPlexMod_MenuMusic::Utils {
@@ -25,6 +26,8 @@ namespace ChatPlexMod_MenuMusic::Utils {
         private:
             static CP_SDK::Unity::TextureRaw::PixelArray m_BackgroundMask;
             static CP_SDK::Unity::TextureRaw::PixelArray m_CoverMask;
+            static std::once_flag                        m_MasksInitFlag;
+            static bool                                  m_MasksReady;
 
         public:
             using t_BytesPtr  = CP_SDK::Utils::MonoPtr<Array<uint8_t>>;

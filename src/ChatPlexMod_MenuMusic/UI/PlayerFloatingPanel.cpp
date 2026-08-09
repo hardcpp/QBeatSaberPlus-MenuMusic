@@ -2,6 +2,7 @@
 #include "ChatPlexMod_MenuMusic/Utils/ArtProvider.hpp"
 #include "ChatPlexMod_MenuMusic/MenuMusic.hpp"
 #include "ChatPlexMod_MenuMusic/MMConfig.hpp"
+#include "ChatPlexMod_MenuMusic/ModulePresence.hpp"
 #include "ChatPlexMod_MenuMusic/Logger.hpp"
 
 #include "assets.hpp"
@@ -10,6 +11,8 @@
 #include <CP_SDK/Unity/Extensions/ColorU.hpp>
 #include <CP_SDK/Unity/Operators.hpp>
 #include <CP_SDK/Unity/SpriteU.hpp>
+
+#include <UnityEngine/Object.hpp>
 
 using namespace CP_SDK::Unity::Extensions;
 using namespace CP_SDK::XUI;
@@ -141,11 +144,24 @@ namespace ChatPlexMod_MenuMusic::UI {
                 x->RTransform()->set_pivot           (Vector2(  1.00f, 0.00f));
                 x->RTransform()->set_anchorMin       (Vector2(  1.00f, 0.00f));
                 x->RTransform()->set_anchorMax       (Vector2(  1.00f, 0.00f));
-                x->RTransform()->set_anchoredPosition(Vector2(-11.00f, 1.15f));
-                x->RTransform()->set_sizeDelta       (Vector2( 35.00f, 5.00f));
+                x->RTransform()->set_anchoredPosition(Vector2(-27.50f, 1.15f));
+                x->RTransform()->set_sizeDelta       (Vector2( 30.00f, 5.00f));
                 x->RTransform()->set_localScale      (0.7f * Vector3::get_one());
             })
             ->Bind(&m_Volume)
+            ->BuildUI(get_transform());
+
+        XUIPrimaryButton::Make(u"Add to queue", {this, &PlayerFloatingPanel::OnPlayItPressed})
+            ->OnReady([](CP_SDK::UI::Components::CPrimaryButton* x) -> void
+            {
+                x->LElement()->set_enabled           (false);
+                x->RTransform()->set_pivot           (Vector2(  1.00f, 0.00f));
+                x->RTransform()->set_anchorMin       (Vector2(  1.00f, 0.00f));
+                x->RTransform()->set_anchorMax       (Vector2(  1.00f, 0.00f));
+                x->RTransform()->set_anchoredPosition(Vector2(-11.00f, 1.15f));
+                x->RTransform()->set_localScale      (0.7f * Vector3::get_one());
+            })
+            ->Bind(&m_AddToQueueButton)
             ->BuildUI(get_transform());
 
         XUIPrimaryButton::Make(u"Play it", {this, &PlayerFloatingPanel::OnPlayItPressed})
@@ -166,6 +182,11 @@ namespace ChatPlexMod_MenuMusic::UI {
         auto& l_Modules = CP_SDK::ChatPlexSDK::GetModules();
         if (std::count_if(l_Modules.begin(), l_Modules.end(), [](auto x) { return x->Name() == u"Audio Tweaker"; }))
             m_Volume->SetActive(false);
+
+        if (!ModulePresence::ChatRequest())
+            m_AddToQueueButton->SetActive(false);
+
+        Object::Destroy(get_transform()->get_parent()->GetComponent<RectMask2D *>());
     }
     /// @brief On view activation
     void PlayerFloatingPanel::OnViewActivation_Impl()
@@ -199,22 +220,31 @@ namespace ChatPlexMod_MenuMusic::UI {
             l_Str2  = l_Str2.substr(0, 50) + u"...";
 
         if (m_SongTitle  && m_SongTitle->Element()) m_SongTitle->Element()->TMProUGUI()->set_text(l_Str1);
-        if (m_SongArtist && m_SongTitle->Element()) m_SongArtist->Element()->TMProUGUI()->set_text(l_Str2);
+        if (m_SongArtist && m_SongArtist->Element()) m_SongArtist->Element()->TMProUGUI()->set_text(l_Str2);
 
         m_CancellationToken->Cancel();
         if (p_Music)
         {
-            p_Music->GetCoverBytesAsync(m_CancellationToken, [this](const CP_SDK::Utils::MonoPtr<Array<uint8_t>>& x) -> void
+            auto l_CancellationToken = m_CancellationToken;
+            auto l_View              = CP_SDK::Utils::MonoPtr<PlayerFloatingPanel>(this);
+
+            p_Music->GetCoverBytesAsync(l_CancellationToken, [l_View, l_CancellationToken](const CP_SDK::Utils::MonoPtr<Array<uint8_t>>& x) -> void
             {
-                Utils::ArtProvider::Prepare(x, m_CancellationToken, [this](Sprite* p_Cover, Sprite* p_Background) -> void
+                Utils::ArtProvider::Prepare(x, l_CancellationToken, [l_View](Sprite* p_Cover, Sprite* p_Background) -> void
                 {
-                    m_MusicCover->SetBackgroundSprite(p_Cover);
-                    m_MusicBackground->SetBackgroundSprite(p_Background);
+                    if (l_View)
+                    {
+                        l_View->m_MusicCover->SetBackgroundSprite(p_Cover);
+                        l_View->m_MusicBackground->SetBackgroundSprite(p_Background);
+                    }
                 });
             }, nullptr);
 
             if (m_PlayItButton)
-                m_PlayItButton->SetInteractable(p_Music->MusicProvider()->SupportPlayIt());
+            {
+                auto l_Provider = p_Music->MusicProvider();
+                m_PlayItButton->SetInteractable(l_Provider && l_Provider->SupportPlayIt());
+            }
         }
 
         m_CurrentMusic = p_Music;
@@ -272,10 +302,14 @@ namespace ChatPlexMod_MenuMusic::UI {
     /// @brief On play the map pressed
     void PlayerFloatingPanel::OnPlayItPressed()
     {
-        if (m_CurrentMusic == nullptr || !m_CurrentMusic->MusicProvider()->SupportPlayIt())
+        if (m_CurrentMusic == nullptr)
             return;
 
-        if (!m_CurrentMusic->MusicProvider()->StartGameSpecificGamePlay(m_CurrentMusic))
+        auto l_Provider = m_CurrentMusic->MusicProvider();
+        if (!l_Provider || !l_Provider->SupportPlayIt())
+            return;
+
+        if (!l_Provider->StartGameSpecificGamePlay(m_CurrentMusic))
             ShowMessageModal(u"Map not found!");
     }
 

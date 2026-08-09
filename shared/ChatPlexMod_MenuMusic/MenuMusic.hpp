@@ -20,9 +20,12 @@
 
 namespace ChatPlexMod_MenuMusic {
 
-    using namespace GlobalNamespace;
-    using namespace UnityEngine;
-    using namespace System::Collections;
+    namespace _v
+    {
+        using namespace GlobalNamespace;
+        using namespace UnityEngine;
+        using namespace System::Collections;
+    }
 
     /// @brief Menu Music Module
     class MenuMusic : public CP_SDK::ModuleBase<MenuMusic>
@@ -41,33 +44,33 @@ namespace ChatPlexMod_MenuMusic {
             CP_SDK::EIModuleBaseActivationType  ActivationType()            const override { return CP_SDK::EIModuleBaseActivationType::OnMenuSceneLoaded;              }
 
         private:
-            CP_SDK::Utils::MonoPtr<UI::SettingsMainView>                        m_SettingsMainView;
-            CP_SDK::Utils::MonoPtr<UI::SettingsLeftView>                        m_SettingsLeftView;
+            CP_SDK::Utils::MonoPtr<UI::SettingsMainView> m_SettingsMainView;
+            CP_SDK::Utils::MonoPtr<UI::SettingsLeftView> m_SettingsLeftView;
 
         private:
-            CP_SDK::Utils::MonoPtr<CP_SDK::UI::Components::CFloatingPanel>      m_PlayerFloatingPanel;
-            CP_SDK::Utils::MonoPtr<UI::PlayerFloatingPanel>                     m_PlayerFloatingPanelView;
+            CP_SDK::Utils::MonoPtr<CP_SDK::UI::Components::CFloatingPanel> m_PlayerFloatingPanel;
+            CP_SDK::Utils::MonoPtr<UI::PlayerFloatingPanel>                m_PlayerFloatingPanelView;
 
-            CP_SDK::Utils::MonoPtr<Coroutine>                                   m_CreateFloatingPlayerCoroutine;
-            CP_SDK::Utils::MonoPtr<Coroutine>                                   m_WaitAndPlayNextSongCoroutine;
+            CP_SDK::Utils::MonoPtr<_v::Coroutine> m_CreateFloatingPlayerCoroutine;
+            CP_SDK::Utils::MonoPtr<_v::Coroutine> m_WaitAndPlayNextSongCoroutine;
 
-            bool                                        m_WantsToQuit;
-            CP_SDK::Utils::MonoPtr<SongPreviewPlayer>   m_PreviewPlayer;
-            CP_SDK::Utils::MonoPtr<AudioClip>           m_OriginalMenuMusic;
-            float                                       m_OriginalAmbientVolumeScale;
-            Data::Music::Ptr                            m_CurrentMusic;
-            CP_SDK::Utils::MonoPtr<AudioClip>           m_CurrentMusicAudioClip;
-            CP_SDK::Utils::MonoPtr<AudioClip>           m_BackupTimeClip;
-            float                                       m_BackupTime;
-            bool                                        m_IsPaused;
+            bool                                          m_WantsToQuit;
+            CP_SDK::Utils::MonoPtr<_v::SongPreviewPlayer> m_PreviewPlayer;
+            CP_SDK::Utils::MonoPtr<_v::AudioClip>         m_OriginalMenuMusic;
+            float                                         m_OriginalAmbientVolumeScale;
+            Data::Music::Ptr                              m_CurrentMusic;
+            CP_SDK::Utils::MonoPtr<_v::AudioClip>         m_CurrentMusicAudioClip;
+            CP_SDK::Utils::MonoPtr<_v::AudioClip>         m_BackupTimeClip;
+            float                                         m_BackupTime;
+            bool                                          m_IsPaused;
 
-            Data::IMusicProvider::Ptr                   m_MusicProvider;
-            int                                         m_CurrentSongIndex;
-            CP_SDK::Utils::MonoPtr<Coroutine>           m_WaitUntillReadyCoroutine;
-            CP_SDK::Misc::FastCancellationToken::Ptr    m_FastCancellationToken;
+            Data::IMusicProvider::Ptr                m_MusicProvider;
+            int                                      m_CurrentSongIndex;
+            CP_SDK::Utils::MonoPtr<_v::Coroutine>    m_WaitUntillReadyCoroutine;
+            CP_SDK::Misc::FastCancellationToken::Ptr m_FastCancellationToken;
 
-            CP_SDK::EGenericScene                       m_LastActiveScene;
-            bool                                        m_LastPlayingRescue;
+            CP_SDK::EGenericScene m_LastActiveScene;
+            bool                  m_LastPlayingRescue;
 
         public:
             /// @brief Constructor
@@ -132,7 +135,7 @@ namespace ChatPlexMod_MenuMusic {
             static custom_types::Helpers::Coroutine Coroutine_WaitUntilReady(CP_SDK::Utils::Action<> p_Callback);
             /// @brief Load the song into the preview player
             /// @param p_OnSceneTransition On scene transition?
-            static custom_types::Helpers::Coroutine Coroutine_LoadAudioClip(bool p_OnSceneTransition, Data::Music::Ptr p_Music, CP_SDK::Utils::MonoPtr<AudioClip> p_AudioClip);
+            static custom_types::Helpers::Coroutine Coroutine_LoadAudioClip(bool p_OnSceneTransition, Data::Music::Ptr p_Music, CP_SDK::Utils::MonoPtr<_v::AudioClip> p_AudioClip);
             /// @brief Wait and play next music
             /// @param p_WaitTime Time to wait
             static custom_types::Helpers::Coroutine Coroutine_WaitAndPlayNextMusic(float p_EndTime);

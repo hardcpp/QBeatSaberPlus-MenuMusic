@@ -29,6 +29,7 @@ namespace ChatPlexMod_MenuMusic::UI {
             _u::XUIText::Ptr                            m_SongArtist;
             _u::XUIIconButton::Ptr                      m_PlayPauseButton;
             _u::XUISlider::Ptr                          m_Volume;
+            _u::XUIPrimaryButton::Ptr                   m_AddToQueueButton;
             _u::XUIPrimaryButton::Ptr                   m_PlayItButton;
 
             CP_SDK::Misc::FastCancellationToken::Ptr    m_CancellationToken;
