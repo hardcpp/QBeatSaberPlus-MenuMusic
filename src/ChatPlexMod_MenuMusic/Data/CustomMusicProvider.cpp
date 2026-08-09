@@ -3,8 +3,13 @@
 #include "ChatPlexMod_MenuMusic/Logger.hpp"
 
 #include <filesystem>
+#include <atomic>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <CP_SDK/Unity/MTCoroutineStarter.hpp>
+#include <CP_SDK/Unity/MTThreadInvoker.hpp>
 
 #include <UnityEngine/Random.hpp>
 
@@ -12,9 +17,23 @@ using namespace UnityEngine;
 
 namespace ChatPlexMod_MenuMusic { namespace Data {
 
+    namespace {
+
+        struct CustomMusicScanResult
+        {
+            std::vector<std::shared_ptr<Music>> Musics;
+            std::string                         Error;
+            std::atomic_bool                    IsDone = false;
+        };
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
     MusicProviderType::E CustomMusicProvider::Type()
     {
-        return MusicProviderType::E::GameMusic;
+        return MusicProviderType::E::CustomMusic;
     }
     bool CustomMusicProvider::IsReady()
     {
@@ -82,54 +101,74 @@ namespace ChatPlexMod_MenuMusic { namespace Data {
     /// @brief Load game songs
     custom_types::Helpers::Coroutine CustomMusicProvider::Coroutine_Load(Ptr p_Self)
     {
-        auto l_Self = *reinterpret_cast<std::shared_ptr<CustomMusicProvider>*>(&p_Self);
+        auto l_Self = std::static_pointer_cast<CustomMusicProvider>(p_Self);
 
         co_yield nullptr;
 
-        try
+        auto l_BaseDirectory = std::filesystem::path(
+            CP_SDK::ChatPlexSDK::BasePath() + CP_SDK::ChatPlexSDK::ProductName() + "/MenuMusic/CustomMusic"
+        );
+        auto l_ScanResult = std::make_shared<CustomMusicScanResult>();
+
+        /// Directory IO can block Quest storage; keep it off the Unity frame thread.
+        CP_SDK::Unity::MTThreadInvoker::EnqueueOnThread([l_BaseDirectory, l_ScanResult, l_Self]() -> void
         {
-            auto l_BaseDirectory = CP_SDK::ChatPlexSDK::BasePath() + CP_SDK::ChatPlexSDK::ProductName() + "/MenuMusic/CustomMusic";
-            auto l_Files         = std::vector<std::string>();
-
-            if (!std::filesystem::exists(l_BaseDirectory))
-                std::filesystem::create_directories(l_BaseDirectory);
-
-            for (const auto& l_Entry : std::filesystem::directory_iterator(l_BaseDirectory))
+            try
             {
-                if (!l_Entry.is_regular_file())
-                    continue;
+                if (!std::filesystem::exists(l_BaseDirectory))
+                    std::filesystem::create_directories(l_BaseDirectory);
 
-                auto l_Path         = l_Entry.path();
-                auto l_Extension    = l_Path.extension();
-                if (   l_Extension != ".egg" && l_Extension != ".ogg"
-                    && l_Extension != ".EGG" && l_Extension != ".OGG")
-                    continue;
+                for (const auto& l_Entry : std::filesystem::directory_iterator(l_BaseDirectory))
+                {
+                    if (!l_Entry.is_regular_file())
+                        continue;
 
-                auto        l_PathTest  = l_Path;
-                std::string l_CoverPath;
+                    auto l_Path      = l_Entry.path();
+                    auto l_Extension = l_Path.extension();
+                    if (   l_Extension != ".egg" && l_Extension != ".ogg"
+                        && l_Extension != ".EGG" && l_Extension != ".OGG")
+                        continue;
 
-                if (std::filesystem::exists(l_PathTest.replace_extension(".jpg")))
-                    l_CoverPath = l_PathTest.replace_extension(".jpg").string();
-                else if (std::filesystem::exists(l_PathTest.replace_extension(".png")))
-                    l_CoverPath = l_PathTest.replace_extension(".png").string();
+                    auto l_PathTest = l_Path;
+                    std::filesystem::path l_CoverPath;
 
-                l_Self->m_Musics.push_back(std::shared_ptr<Music>(new Music(
-                    l_Self,
-                    CP_SDK::Utils::StrToU16Str(l_Path.string()),
-                    CP_SDK::Utils::StrToU16Str(l_CoverPath),
-                    CP_SDK::Utils::StrToU16Str(l_Path.stem().string()),
-                    u" ",
-                    u""
-                )));
+                    l_PathTest.replace_extension(".jpg");
+                    if (std::filesystem::exists(l_PathTest))
+                        l_CoverPath = l_PathTest;
+                    else
+                    {
+                        l_PathTest = l_Path;
+                        l_PathTest.replace_extension(".png");
+                        if (std::filesystem::exists(l_PathTest))
+                            l_CoverPath = l_PathTest;
+                    }
+
+                    l_ScanResult->Musics.emplace_back(std::make_shared<Music>(
+                        l_Self,
+                        CP_SDK::Utils::StrToU16Str(l_Path.string()),
+                        CP_SDK::Utils::StrToU16Str(l_CoverPath.string()),
+                        CP_SDK::Utils::StrToU16Str(l_Path.stem().string()),
+                        u" ",
+                        u""
+                    ));
+                }
+            }
+            catch (const std::exception& l_Exception)
+            {
+                l_ScanResult->Error = l_Exception.what();
             }
 
-            l_Self->Shuffle();
-        }
-        catch (const std::exception& l_Exception)
-        {
-            Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][CustomMusicProvider.Coroutine_Load] Can't load audio! Exception:");
-            Logger::Instance->Error(l_Exception);
-        }
+            l_ScanResult->IsDone.store(true, std::memory_order_release); });
+
+        while (!l_ScanResult->IsDone.load(std::memory_order_acquire))
+            co_yield nullptr;
+
+        if (!l_ScanResult->Error.empty())
+            Logger::Instance->Error(u"[ChatPlexMod_MenuMusic.Data][CustomMusicProvider.Coroutine_Load] Can't scan custom music: " + CP_SDK::Utils::StrToU16Str(l_ScanResult->Error));
+
+        std::size_t l_ProcessedFiles = 0;
+        l_Self->m_Musics.swap(l_ScanResult->Musics);
+        l_Self->Shuffle();
 
         l_Self->m_IsLoading = false;
     }
